@@ -4,14 +4,13 @@
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Contrôle de la jauge HyperX</title>
   <style>
-    *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#090a0d;color:#fff;font:16px Arial,sans-serif;padding:20px}.panel{width:min(520px,100%);padding:28px;background:#15171c;border:1px solid #ff1848;border-radius:14px;box-shadow:0 0 30px #ff184833}h1{margin:0 0 8px;color:#ff1848}.hint{color:#aeb2bc;margin:0 0 24px}.value{font-size:72px;font-weight:800;text-align:center;margin:20px}.value span{color:#ff1848;font-size:.5em}.actions,.steps{display:grid;gap:10px}.actions{grid-template-columns:1fr 1fr;margin-bottom:18px}.steps{grid-template-columns:repeat(4,1fr)}button{min-height:48px;border:1px solid #ff526f;border-radius:8px;background:#e30e3b;color:white;font-weight:800;font-size:16px;cursor:pointer}button:hover{filter:brightness(1.15)}button.secondary{background:#292c33;border-color:#555}.status{text-align:center;min-height:22px;color:#8ee5a8;margin-top:16px}.login{display:grid;gap:10px}.login input{height:46px;border-radius:8px;border:1px solid #555;background:#090a0d;color:#fff;padding:0 12px}.hidden{display:none}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#090a0d;color:#fff;font:16px Arial,sans-serif;padding:20px}.panel{width:min(520px,100%);padding:28px;background:#15171c;border:1px solid #ff1848;border-radius:14px;box-shadow:0 0 30px #ff184833}h1{margin:0 0 8px;color:#ff1848}.hint{color:#aeb2bc;margin:0 0 24px}.value{font-size:72px;font-weight:800;text-align:center;margin:20px}.value span{color:#ff1848;font-size:.5em}.actions,.steps{display:grid;gap:10px}.actions{grid-template-columns:1fr 1fr;margin-bottom:18px}.steps{grid-template-columns:repeat(4,1fr)}button{min-height:48px;border:1px solid #ff526f;border-radius:8px;background:#e30e3b;color:white;font-weight:800;font-size:16px;cursor:pointer}button:hover{filter:brightness(1.15)}button.secondary{background:#292c33;border-color:#555}.status{text-align:center;min-height:22px;color:#8ee5a8;margin-top:16px}
   </style>
 </head>
 <body>
   <main class="panel">
     <h1>Contrôle HyperX</h1><p class="hint">Ce panneau commande directement la source OBS.</p>
-    <section id="login" class="login"><input id="email" type="email" placeholder="E-mail Firebase"><input id="password" type="password" placeholder="Mot de passe"><button id="connect">Se connecter</button></section>
-    <section id="controls" class="hidden">
+    <section id="controls">
       <div id="value" class="value">0<span>%</span></div>
       <div class="actions"><button id="previous" class="secondary">← Précédent</button><button id="next">Suivant +</button></div>
       <div id="steps" class="steps"></div>
@@ -23,9 +22,8 @@
   <script type="module">
     import{initializeApp}from"https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
     import{getDatabase,ref,onValue,set}from"https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
-    import{getAuth,signInWithEmailAndPassword,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
     const levels=[0,7,14,21,28,35,42,50];let current=0;
-    const app=initializeApp(window.FIREBASE_CONFIG),db=getDatabase(app),auth=getAuth(app),gaugeRef=ref(db,"hyperxGauge/progress");
+    const app=initializeApp(window.FIREBASE_CONFIG),db=getDatabase(app),gaugeRef=ref(db,"hyperxGauge/progress");
     const status=document.getElementById("status"),value=document.getElementById("value"),steps=document.getElementById("steps");
     function message(t,error=false){status.textContent=t;status.style.color=error?"#ff7a91":"#8ee5a8"}
     async function write(v){try{await set(gaugeRef,v);message("Jauge mise à jour : "+v+" %")}catch(e){message("Impossible de modifier la jauge.",true)}}
@@ -34,8 +32,7 @@
     document.getElementById("next").onclick=()=>write(levels[Math.min(levels.indexOf(current)+1,levels.length-1)]);
     document.getElementById("previous").onclick=()=>write(levels[Math.max(levels.indexOf(current)-1,0)]);
     document.getElementById("reset").onclick=()=>write(0);
-    document.getElementById("connect").onclick=async()=>{try{await signInWithEmailAndPassword(auth,document.getElementById("email").value,document.getElementById("password").value)}catch(e){message("E-mail ou mot de passe incorrect.",true)}};
-    onAuthStateChanged(auth,user=>{document.getElementById("login").classList.toggle("hidden",!!user);document.getElementById("controls").classList.toggle("hidden",!user);if(user)message("Connecté — prêt à déclencher")});
+    message("Prêt à déclencher");
   </script>
 </body>
 </html>
