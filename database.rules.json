@@ -1,0 +1,11 @@
+{
+  "rules": {
+    "hyperxGauge": {
+      "progress": {
+        ".read": true,
+        ".write": "auth != null",
+        ".validate": "newData.isNumber() && (newData.val() == 0 || newData.val() == 7 || newData.val() == 14 || newData.val() == 21 || newData.val() == 28 || newData.val() == 35 || newData.val() == 42 || newData.val() == 50)"
+      }
+    }
+  }
+}

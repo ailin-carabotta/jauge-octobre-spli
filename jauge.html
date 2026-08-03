@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jauge HyperX — OBS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Condensed:wght@700;800&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root{--red:#ff1848;--pink:#ff526f}
+    *{box-sizing:border-box}
+    html,body{width:100%;height:100%;margin:0;background:transparent!important;overflow:hidden}
+    body{font-family:"Fira Sans Condensed",sans-serif}
+    .overlay{width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:3.5% 5.5%}
+    .assembly{width:100%;max-width:1400px;animation:enter .65s cubic-bezier(.2,.8,.2,1) both}
+    .brand{text-align:center;margin-bottom:34px}
+    .brand img{display:block;width:min(290px,30vw);height:auto;margin:0 auto 18px;filter:drop-shadow(0 0 12px rgba(255,24,72,.28))}
+    .promo{color:var(--red);font-size:clamp(22px,2.15vw,34px);font-weight:800;letter-spacing:.045em;text-shadow:0 0 12px rgba(255,24,72,.3)}
+    .frame{position:relative;padding:38px 42px 34px;background:linear-gradient(110deg,rgba(8,9,12,.98),rgba(28,30,36,.96) 54%,rgba(10,11,14,.98));clip-path:polygon(24px 0,calc(100% - 24px) 0,100% 24px,100% calc(100% - 24px),calc(100% - 24px) 100%,24px 100%,0 calc(100% - 24px),0 24px);border:1px solid rgba(255,41,79,.8);box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 24px rgba(255,24,72,.2),0 16px 40px rgba(0,0,0,.5)}
+    .frame:before{content:"";position:absolute;inset:8px;border-top:1px solid rgba(255,255,255,.09);border-bottom:1px solid rgba(255,24,72,.18);pointer-events:none}
+    .top{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;margin-bottom:30px}
+    .micro{font-family:"Space Mono",monospace;font-size:clamp(10px,1vw,15px);color:#fff;letter-spacing:.16em}
+    .status{color:var(--pink)}
+    .dot{display:inline-block;width:11px;height:11px;margin-right:13px;background:var(--red);box-shadow:0 0 12px var(--red);transform:rotate(45deg);animation:pulse 1.5s ease-in-out infinite}
+    .row{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:62px;align-items:center}
+    .track{height:50px;position:relative;overflow:hidden;background:repeating-linear-gradient(90deg,#1c1e24 0 28px,#111318 28px 32px);border:1px solid #41444d;clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);box-shadow:inset 0 0 18px rgba(0,0,0,.85)}
+    .track:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);transform:translateX(-100%);animation:scan 3.2s linear infinite}
+    .fill{height:100%;width:0;background:linear-gradient(90deg,#bf072c 0%,#ff1848 65%,#ff6c82 100%);box-shadow:0 0 14px rgba(255,24,72,.9),0 0 27px rgba(255,24,72,.5);transition:width .56s cubic-bezier(.2,.9,.25,1);position:relative}
+    .fill:after{content:"";position:absolute;top:0;right:0;width:30px;height:100%;background:rgba(255,255,255,.62);filter:blur(1px);clip-path:polygon(45% 0,100% 0,55% 100%,0 100%)}
+    .percent{min-width:150px;color:#fff;font-size:clamp(64px,7vw,100px);font-weight:800;line-height:.75;letter-spacing:-.06em;text-align:right;text-shadow:0 0 18px rgba(255,24,72,.38)}
+    .percent span{color:var(--red);font-size:.44em;margin-left:3px;letter-spacing:0}
+    @keyframes enter{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+    @keyframes scan{to{transform:translateX(180%)}}
+    @keyframes pulse{50%{opacity:.45;box-shadow:0 0 3px var(--red)}}
+  </style>
+</head>
+<body>
+  <main class="overlay">
+    <section class="assembly" aria-label="Jauge de code promo HyperX">
+      <div class="brand">
+        <img src="hyperx-logo.png" alt="HyperX">
+        <div class="promo">GÉNÉRATEUR DE CODE PROMO</div>
+      </div>
+      <div class="frame">
+        <div class="top">
+          <span class="micro"><i class="dot"></i>STREAM POWER // LIVE</span>
+          <span class="micro status">CODE PROMO</span>
+        </div>
+        <div class="row">
+          <div id="track" class="track" role="progressbar" aria-valuemin="0" aria-valuemax="50" aria-valuenow="0"><div id="fill" class="fill"></div></div>
+          <output id="display" class="percent">0<span>%</span></output>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="firebase-config.js"></script>
+  <script type="module">
+    import {initializeApp} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+    import {getDatabase,ref,onValue} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+    const fill=document.getElementById("fill"),display=document.getElementById("display"),track=document.getElementById("track");
+    function render(value){const p=[0,7,14,21,28,35,42,50].includes(Number(value))?Number(value):0;fill.style.width=(p===50?100:(p/50)*100)+"%";display.innerHTML=p+"<span>%</span>";track.setAttribute("aria-valuenow",p)}
+    try{const app=initializeApp(window.FIREBASE_CONFIG);onValue(ref(getDatabase(app),"hyperxGauge/progress"),s=>render(s.val()??0));}catch(e){console.error("Configuration Firebase manquante",e);render(0)}
+  </script>
+</body>
+</html>
