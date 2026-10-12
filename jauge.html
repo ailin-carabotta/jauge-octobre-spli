@@ -48,7 +48,7 @@
           <span class="micro status">CODE PROMO</span>
         </div>
         <div class="row">
-          <div id="track" class="track" role="progressbar" aria-valuemin="0" aria-valuemax="30" aria-valuenow="0"><div id="fill" class="fill"></div></div>
+          <div id="track" class="track" role="progressbar" aria-valuemin="0" aria-valuemax="40" aria-valuenow="0"><div id="fill" class="fill"></div></div>
           <output id="display" class="percent">0<span>%</span></output>
         </div>
       </div>
@@ -60,11 +60,11 @@
     import {getDatabase,ref,onValue} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
     const fill=document.getElementById("fill"),display=document.getElementById("display"),track=document.getElementById("track");
    function render(value){
-  const p=[0,3,6,9,12,15,18,21,24,27,30].includes(Number(value))
+  const p=[0,4,8,12,16,20,24,28,32,36,40].includes(Number(value))
     ? Number(value)
     : 0;
 
-  fill.style.width=(p/30*100)+"%";
+  fill.style.width=(p/40*100)+"%";
   display.innerHTML=p+"<span>%</span>";
   track.setAttribute("aria-valuenow",p);
 }
