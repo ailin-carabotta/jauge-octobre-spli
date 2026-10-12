@@ -26,7 +26,7 @@
     const app=initializeApp(window.FIREBASE_CONFIG),db=getDatabase(app),gaugeRef=ref(db,"hyperxGauge/progress");
     const status=document.getElementById("status"),value=document.getElementById("value"),steps=document.getElementById("steps");
     function message(t,error=false){status.textContent=t;status.style.color=error?"#ff7a91":"#8ee5a8"}
-    async function write(v){try{await set(gaugeRef,v);message("Jauge mise à jour : "+v+" %")}catch(e){message("Impossible de modifier la jauge.",true)}}
+    async function write(v){try{await set(gaugeRef,v);message("Jauge mise à jour : "+v+" %")}catch(e){console.error("Mise à jour Firebase refusée",e);message("Impossible de modifier la jauge : "+(e.code||e.message||"erreur inconnue"),true)}}
     levels.forEach(v=>{const b=document.createElement("button");b.textContent=v+" %";b.className=v===0?"secondary":"";b.onclick=()=>write(v);steps.appendChild(b)});
     onValue(gaugeRef,s=>{current=levels.includes(Number(s.val()))?Number(s.val()):0;value.innerHTML=current+"<span>%</span>"});
     document.getElementById("next").onclick=()=>write(levels[Math.min(levels.indexOf(current)+1,levels.length-1)]);
