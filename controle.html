@@ -22,7 +22,7 @@
   <script type="module">
     import{initializeApp}from"https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
     import{getDatabase,ref,onValue,set}from"https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
-    const levels=[0,5,10,15,20,25,30];let current=0;
+    const levels=[0,3,6,9,12,15,18,21,24,27,30];let current=0;
     const app=initializeApp(window.FIREBASE_CONFIG),db=getDatabase(app),gaugeRef=ref(db,"hyperxGauge/progress");
     const status=document.getElementById("status"),value=document.getElementById("value"),steps=document.getElementById("steps");
     function message(t,error=false){status.textContent=t;status.style.color=error?"#ff7a91":"#8ee5a8"}
