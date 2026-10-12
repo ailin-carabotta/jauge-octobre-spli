@@ -4,7 +4,7 @@
       "progress": {
         ".read": true,
         ".write": "auth != null",
-        ".validate": "newData.isNumber() && (newData.val() == 0 || newData.val() == 7 || newData.val() == 14 || newData.val() == 21 || newData.val() == 28 || newData.val() == 35 || newData.val() == 42 || newData.val() == 50)"
+        ".validate": "newData.isNumber() && (newData.val() == 0 || newData.val() == 4 || newData.val() == 8 || newData.val() == 12 || newData.val() == 16 || newData.val() == 20 || newData.val() == 24 || newData.val() == 28 || newData.val() == 32 || newData.val() == 36 || newData.val() == 40)"
       }
     }
   }
